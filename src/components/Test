@@ -1,0 +1,16 @@
+// import axios from 'axios';
+
+// function TestConnection() {
+//   const testAPI = async () => {
+//     try {
+//       const res = await axios.get('/api/test'); // proxy to backend
+//       alert("Backend says: " + res.data);
+//     } catch (err) {
+//       alert("Error: " + err.message);
+//     }
+//   };
+
+//   return <button onClick={testAPI}>Test Backend Connection</button>;
+// }
+
+// export default TestConnection;
