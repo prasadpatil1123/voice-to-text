@@ -9,7 +9,10 @@ export default function FileUploadPage() {
   const handleFileChange = (e) => setFile(e.target.files[0]);
 
   const handleUpload = async () => {
-    if (!file) return alert("Select an MP3/WAV file first");
+    if (!file) {
+      alert("Select an MP3/WAV file first");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("file", file);
@@ -19,7 +22,13 @@ export default function FileUploadPage() {
       const res = await axios.post("http://localhost:8080/speech/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setResultPath(res.data.filePath || "check In custom folder");
+
+      // If backend sends { filePath: "C:\\path\\file.txt" }
+      if (res.data?.filePath) {
+        setResultPath(res.data.filePath);
+      } else {
+        setResultPath("Check in custom folder");
+      }
     } catch (err) {
       console.error(err);
       alert("Upload failed");
@@ -28,19 +37,40 @@ export default function FileUploadPage() {
   };
 
   return (
-    <div className="upload-container">
+    <div className="upload-container" style={{ maxWidth: "400px", margin: "auto", textAlign: "center" }}>
       <h2>Upload Audio File</h2>
+
       <input type="file" accept=".mp3,.wav" onChange={handleFileChange} />
-      <button onClick={handleUpload} disabled={loading}>
+
+      <button
+        onClick={handleUpload}
+        disabled={loading}
+        style={{ marginTop: "10px", padding: "8px 15px", cursor: "pointer" }}
+      >
         {loading ? "Processing..." : "Upload"}
       </button>
 
-      {loading && <div className="progress-bar"></div>}
+      {loading && <p style={{ color: "blue" }}>⏳ Processing your file...</p>}
 
       {resultPath && (
-        <div className="result-box">
+        <div
+          className="result-box"
+          style={{
+            marginTop: "20px",
+            padding: "10px",
+            backgroundColor: "#f5f5f5",
+            borderRadius: "8px",
+            textAlign: "left",
+          }}
+        >
           <h4>✅ File Saved Path:</h4>
-          <p>{resultPath}</p>
+          {resultPath.startsWith("http") ? (
+            <a href={resultPath} target="_blank" rel="noopener noreferrer">
+              {resultPath}
+            </a>
+          ) : (
+            <p>{resultPath}</p> // For local system path
+          )}
         </div>
       )}
     </div>
